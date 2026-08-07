@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Z_First — Placement Test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Nunito:wght@400;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+<style>
+html, body { overflow-x: hidden; max-width: 100%; }
+  :root{
+    --navy-deep:#0A2647; --navy:#123B66; --sky:#2C74B3; --gold:#F2A93B;
+    --bg:#F5F8FC; --line:rgba(10,38,71,0.10); --text:#0A2647; --muted:#5B6B82;
+    --ok:#16A34A; --bad:#DC2626;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Nunito', sans-serif; background:var(--bg); color:var(--text); }
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; }
+  .wrap{ max-width:720px; margin:0 auto; padding:24px 20px 60px; }
+  .brand-bar{ background:var(--navy-deep); padding:16px 20px; display:flex; align-items:center; gap:10px; }
+  .brand-mark{ width:28px; height:28px; border-radius:8px; background:linear-gradient(145deg, var(--gold), #D98826); display:flex; align-items:center; justify-content:center; color:#0A2647; font-weight:700; font-size:12px; font-family:'JetBrains Mono', monospace; }
+  .brand-bar span{ color:#fff; font-weight:700; font-size:17px; }
+  .card{ background:#fff; border-radius:16px; padding:28px 26px; box-shadow:0 8px 24px -16px rgba(10,38,71,0.25); margin-bottom:20px; }
+  .progress-bar{ height:6px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:24px; }
+  .progress-fill{ height:100%; background:var(--gold); transition:width .3s ease; }
+  .q-num{ font-size:13px; color:var(--muted); font-weight:700; margin-bottom:8px; }
+  .q-text{ font-size:17px; font-weight:700; margin-bottom:16px; line-height:1.5; }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    display:flex; align-items:center; gap:12px; padding:12px 16px; border-radius:10px;
+    border:1.5px solid var(--line); cursor:pointer; font-size:15px; transition:all .15s ease;
+  }
+  .opt:hover{ border-color:var(--sky); background:var(--bg); }
+  .opt.selected{ border-color:var(--sky); background:rgba(44,116,179,0.08); font-weight:700; }
+  .opt .letter{
+    width:26px; height:26px; border-radius:50%; border:1.5px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:700; color:var(--muted);
+  }
+  .opt.selected .letter{ background:var(--sky); color:#fff; border-color:var(--sky); }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 22px; border-radius:999px; border:1.5px solid transparent; cursor:pointer;
+    font-family:'Nunito', sans-serif; font-weight:800; font-size:15px;
+    background:linear-gradient(145deg, var(--gold), #D98826); color:var(--navy-deep);
+  }
+  .btn:disabled{ opacity:1; background:#E4E9F0; border-color:var(--line); color:var(--muted); cursor:not-allowed; box-shadow:none; }
+  .btn-row{ display:flex; justify-content:flex-end; margin-top:22px; }
+  .reading-text{ background:var(--bg); border-radius:12px; padding:18px 20px; font-size:14.5px; line-height:1.7; margin-bottom:22px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:13px; font-weight:700; margin-bottom:6px; }
+  .field input{ width:100%; padding:11px 13px; border-radius:9px; border:1.5px solid var(--line); font-size:15px; }
+  .field select{
+    width:100%; padding:11px 13px; border-radius:9px; border:1.5px solid var(--line); font-size:15px;
+    font-family:'Nunito', sans-serif; background:#fff; color:var(--text); cursor:pointer;
+  }
+  .result-emoji{ font-size:56px; text-align:center; margin-bottom:6px; }
+  .result-level{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:30px; text-align:center; color:var(--navy-deep); margin-bottom:4px; }
+  .result-sub{ text-align:center; color:var(--muted); margin-bottom:20px; }
+  .result-score{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:15px; color:var(--muted); margin-bottom:24px; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+  .intro-list{ margin:16px 0; padding-left:20px; color:var(--muted); font-size:14.5px; line-height:1.8; }
+  @media (max-width:600px){
+    .wrap{ padding:14px 12px 40px; }
+    .card{ padding:18px 16px; border-radius:12px; }
+    .btn-row{ justify-content:stretch; }
+    .btn-row .btn{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+<div class="brand-bar">
+  <div class="brand-mark">Z1</div>
+  <span>Z_First — Placement Test</span>
+</div>
+
+<div class="wrap">
+
+  <!-- ЭКРАН 1: ВВОД ИМЕНИ -->
+  <div class="screen active" id="screen-start">
+    <div class="card">
+      <h2>Определите свой уровень английского</h2>
+      <p style="color:var(--muted);">Бесплатный тест поможет понять, с какой группы вам стоит начать занятия — Elementary, Pre-Intermediate или Intermediate.</p>
+      <ul class="intro-list">
+        <li>24 вопроса на грамматику и лексику</li>
+        <li>Короткий текст с вопросами на понимание</li>
+        <li>Займёт around 15-20 минут</li>
+        <li>В конце — сразу узнаете свой уровень</li>
+      </ul>
+      <div class="field">
+        <label for="start-name">Ваше имя</label>
+        <input id="start-name" type="text" placeholder="Например: Aziz Karimov">
+      </div>
+      <div class="field">
+        <label for="start-phone">Телефон (чтобы мы могли связаться)</label>
+        <input id="start-phone" type="tel" placeholder="+998...">
+      </div>
+      <div class="field">
+        <label for="start-birthday">Дата рождения ребёнка</label>
+        <input id="start-birthday" type="date">
+      </div>
+      <div class="field">
+        <label for="start-adsource">Как узнали про наш центр Z_First?</label>
+        <select id="start-adsource">
+          <option value="Интернет (СММ)">Интернет / соцсети</option>
+          <option value="Знакомый">От знакомых</option>
+          <option value="Прохожий">Проходил(а) мимо</option>
+          <option value="Флаер (Ваучер, Баннер...)">Флаер / баннер</option>
+          <option value="Яндекс Карта">Яндекс Карты</option>
+          <option value="Chat GPT">Chat GPT / AI-ассистент</option>
+          <option value="VAQF">VAQF</option>
+          <option value="N/A">Другое</option>
+        </select>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="start-btn">Начать тест →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 2: ВОПРОСЫ ГРАММАТИКИ/ЛЕКСИКИ -->
+  <div class="screen" id="screen-quiz">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="card">
+      <div class="q-num" id="q-num">Вопрос 1 из 24</div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="btn-row">
+        <button class="btn" id="next-btn" disabled>Далее →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 3: ЧТЕНИЕ -->
+  <div class="screen" id="screen-reading">
+    <div class="card">
+      <h3 style="margin-top:0;">📖 Текст для чтения</h3>
+      <div class="reading-text" id="reading-passage"></div>
+      <div class="q-num" id="r-num">Вопрос 1 из 6</div>
+      <div class="q-text" id="r-text"></div>
+      <div class="options" id="r-options"></div>
+      <div class="btn-row">
+        <button class="btn" id="r-next-btn" disabled>Далее →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЭКРАН 4: РЕЗУЛЬТАТ -->
+  <div class="screen" id="screen-result">
+    <div class="card">
+      <div class="result-emoji" id="result-emoji">🎉</div>
+      <div class="result-level" id="result-level">Pre-Intermediate</div>
+      <div class="result-sub" id="result-sub">Рекомендуемая группа</div>
+      <div class="result-score" id="result-score">Правильных ответов: 0 из 30</div>
+      <p style="text-align:center; color:var(--muted); font-size:14px;">Мы уже получили ваши результаты — администратор свяжется с вами, чтобы подобрать удобную группу и время.</p>
+      <div class="btn-row" style="justify-content:center;">
+        <a class="btn" href="index.html">Вернуться на сайт</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ═══════════════════════════════════════════════════════════════
+  // ОРИГИНАЛЬНЫЕ вопросы, написанные самостоятельно (не из чужих
+  // учебников) — специально, чтобы не нарушать авторские права.
+  // ═══════════════════════════════════════════════════════════════
+
+  const GRAMMAR_QUESTIONS = [
+    { q: "She ___ to the market every Saturday morning.", options: ["go", "goes", "going", "gone"], correct: 1 },
+    { q: "___ you like some tea?", options: ["Do", "Does", "Would", "Are"], correct: 2 },
+    { q: "My brother ___ football very well.", options: ["play", "plays", "playing", "played"], correct: 1 },
+    { q: "There ___ a lot of books on the shelf.", options: ["is", "are", "be", "was"], correct: 1 },
+    { q: "I ___ my homework yesterday evening.", options: ["do", "did", "done", "doing"], correct: 1 },
+    { q: "Look! It ___ outside.", options: ["rain", "rains", "is raining", "rained"], correct: 2 },
+    { q: "We ___ to Samarkand next summer.", options: ["travel", "travelled", "are going to travel", "travels"], correct: 2 },
+    { q: "This is the ___ film I have ever seen.", options: ["good", "better", "best", "goodest"], correct: 2 },
+    { q: "If it rains tomorrow, we ___ at home.", options: ["stay", "will stay", "stayed", "staying"], correct: 1 },
+    { q: "She has lived here ___ five years.", options: ["since", "for", "from", "at"], correct: 1 },
+    { q: "He asked me where I ___ from.", options: ["am", "was", "were", "be"], correct: 1 },
+    { q: "By the time we arrived, the film ___ .", options: ["already started", "had already started", "has already started", "already starts"], correct: 1 },
+    { q: "I wish I ___ more time to study.", options: ["have", "had", "has", "will have"], correct: 1 },
+    { q: "The report ___ by the manager tomorrow.", options: ["will finish", "will be finished", "finishes", "is finishing"], correct: 1 },
+    { q: "___ you help me, please?", options: ["Could", "Do", "Am", "Did"], correct: 0 },
+    { q: "She's the woman ___ daughter won the competition.", options: ["who", "which", "whose", "that"], correct: 2 },
+    { q: "He speaks English ___ than his sister.", options: ["good", "well", "better", "best"], correct: 2 },
+    { q: "I haven't seen him ___ Monday.", options: ["for", "since", "during", "at"], correct: 1 },
+    { q: "They ___ dinner when the phone rang.", options: ["have", "had", "were having", "has"], correct: 2 },
+    { q: "It's important ___ on time for the interview.", options: ["being", "be", "to be", "been"], correct: 2 },
+    { q: "This exercise is ___ easier than the last one.", options: ["much", "many", "very", "so"], correct: 0 },
+    { q: "I'm not used ___ up so early.", options: ["to get", "to getting", "get", "getting"], correct: 1 },
+    { q: "She denied ___ the money.", options: ["to take", "taking", "take", "took"], correct: 1 },
+    { q: "Had I known about the meeting, I ___ .", options: ["would come", "would have come", "will come", "came"], correct: 1 }
+  ];
+
+  const READING_PASSAGE = `Every year, the small town of Qibray holds a "Green Weekend" festival to celebrate nature and local farming. Families come from nearby villages to sell fruit, honey, and handmade crafts. This year, the festival introduced something new: a bicycle path connecting the town square to the river, so that visitors could cycle instead of driving. Organizers say the change reduced traffic by almost a third compared to last year. Local farmer Nodira Yusupova said she sold twice as many baskets of apricots as usual, thanks to the extra visitors who arrived by bike. The festival's success has encouraged the town council to plan a similar bicycle path for the market street next year.`;
+
+  const READING_QUESTIONS = [
+    { q: "The Green Weekend festival celebrates nature and local farming.", options: ["True", "False"], correct: 0 },
+    { q: "The new bicycle path connects the town square to the river.", options: ["True", "False"], correct: 0 },
+    { q: "Traffic increased compared to last year.", options: ["True", "False"], correct: 1 },
+    { q: "Why did Nodira Yusupova sell more apricots than usual?", options: ["She lowered her prices", "More visitors arrived by bike", "The harvest was bigger", "She opened a new stall"], correct: 1 },
+    { q: "What does the town council plan to do next?", options: ["Cancel the festival", "Build a path on the market street", "Stop selling honey", "Move the festival to another town"], correct: 1 },
+    { q: "Where do families selling goods at the festival come from?", options: ["Only Qibray itself", "Nearby villages", "The capital city", "Other countries"], correct: 1 }
+  ];
+
+  // ═══════════════════════════════════════════════════════════════
+
+  // Перемешивает массив случайным образом (алгоритм Фишера-Йетса)
+  function shuffleArray(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Перемешивает варианты ответов внутри вопроса, сохраняя, какой из них правильный
+  function shuffleQuestionOptions(item){
+    const correctText = item.options[item.correct];
+    const shuffledOptions = shuffleArray(item.options);
+    return {
+      q: item.q,
+      options: shuffledOptions,
+      correct: shuffledOptions.indexOf(correctText)
+    };
+  }
+
+  // На каждый запуск теста — свой случайный порядок вопросов И свой порядок вариантов внутри каждого
+  let activeGrammarQuestions = [];
+  let activeReadingQuestions = [];
+
+  function prepareRandomizedTest(){
+    activeGrammarQuestions = shuffleArray(GRAMMAR_QUESTIONS).map(shuffleQuestionOptions);
+    activeReadingQuestions = shuffleArray(READING_QUESTIONS).map(shuffleQuestionOptions);
+  }
+
+  let grammarAnswers = [];
+  let readingAnswers = [];
+  let currentQ = 0;
+  let currentR = 0;
+  let studentName = '';
+  let studentPhone = '';
+  let studentBirthday = '';
+  let studentAdSource = '';
+
+  function show(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    studentName = document.getElementById('start-name').value.trim();
+    studentPhone = document.getElementById('start-phone').value.trim();
+    studentBirthday = document.getElementById('start-birthday').value;
+    studentAdSource = document.getElementById('start-adsource').value;
+    if (!studentName || !studentPhone){
+      alert('Пожалуйста, заполните имя и телефон.');
+      return;
+    }
+    currentQ = 0;
+    grammarAnswers = [];
+    prepareRandomizedTest();
+    renderGrammarQuestion();
+    show('screen-quiz');
+  });
+
+  function renderGrammarQuestion(){
+    const item = activeGrammarQuestions[currentQ];
+    document.getElementById('q-num').textContent = `Вопрос ${currentQ + 1} из ${activeGrammarQuestions.length}`;
+    document.getElementById('progress-fill').style.width = (currentQ / activeGrammarQuestions.length * 100) + '%';
+    document.getElementById('q-text').textContent = item.q;
+
+    const optsEl = document.getElementById('q-options');
+    optsEl.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    item.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'opt';
+      div.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+      div.addEventListener('click', () => {
+        document.querySelectorAll('#q-options .opt').forEach(o => o.classList.remove('selected'));
+        div.classList.add('selected');
+        grammarAnswers[currentQ] = i;
+        document.getElementById('next-btn').disabled = false;
+      });
+      optsEl.appendChild(div);
+    });
+    document.getElementById('next-btn').disabled = grammarAnswers[currentQ] === undefined;
+  }
+
+  document.getElementById('next-btn').addEventListener('click', () => {
+    currentQ++;
+    if (currentQ < activeGrammarQuestions.length){
+      renderGrammarQuestion();
+    } else {
+      currentR = 0;
+      readingAnswers = [];
+      document.getElementById('reading-passage').textContent = READING_PASSAGE;
+      renderReadingQuestion();
+      show('screen-reading');
+    }
+  });
+
+  function renderReadingQuestion(){
+    const item = activeReadingQuestions[currentR];
+    document.getElementById('r-num').textContent = `Вопрос ${currentR + 1} из ${activeReadingQuestions.length}`;
+    document.getElementById('r-text').textContent = item.q;
+
+    const optsEl = document.getElementById('r-options');
+    optsEl.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D'];
+    item.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'opt';
+      div.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+      div.addEventListener('click', () => {
+        document.querySelectorAll('#r-options .opt').forEach(o => o.classList.remove('selected'));
+        div.classList.add('selected');
+        readingAnswers[currentR] = i;
+        document.getElementById('r-next-btn').disabled = false;
+      });
+      optsEl.appendChild(div);
+    });
+    document.getElementById('r-next-btn').disabled = readingAnswers[currentR] === undefined;
+  }
+
+  document.getElementById('r-next-btn').addEventListener('click', () => {
+    currentR++;
+    if (currentR < activeReadingQuestions.length){
+      renderReadingQuestion();
+    } else {
+      finishTest();
+    }
+  });
+
+  function finishTest(){
+    let correctCount = 0;
+    activeGrammarQuestions.forEach((item, i) => { if (grammarAnswers[i] === item.correct) correctCount++; });
+    activeReadingQuestions.forEach((item, i) => { if (readingAnswers[i] === item.correct) correctCount++; });
+
+    const total = activeGrammarQuestions.length + activeReadingQuestions.length; // 30
+    const pct = Math.round((correctCount / total) * 100);
+
+    let level, emoji;
+    if (pct < 40){ level = 'Elementary'; emoji = '🌱'; }
+    else if (pct < 62){ level = 'Pre-Intermediate'; emoji = '🌿'; }
+    else { level = 'Intermediate'; emoji = '🌳'; }
+
+    document.getElementById('result-emoji').textContent = emoji;
+    document.getElementById('result-level').textContent = level;
+    document.getElementById('result-sub').textContent = 'Рекомендуемая группа для начала занятий';
+    document.getElementById('result-score').textContent = `Правильных ответов: ${correctCount} из ${total} (${pct}%)`;
+    show('screen-result');
+
+    submitResultAsLead(studentName, studentPhone, level, correctCount, total, pct, studentBirthday, studentAdSource);
+  }
+
+  // Отправляем результат как лид в Hollihop — переиспользуем тот же прокси, что и форма на сайте
+  const HOLLIHOP_PROXY_URL = 'https://script.google.com/macros/s/AKfycbwDhnnQ01AyXmFv_Mp7SyILVWE2lRsagWOfnnzRTxD2aO_g5Zd-NoiF6sY3T4CfZHz9pg/exec';
+  function submitResultAsLead(name, phone, level, correctCount, total, pct, birthday, adSource){
+    const url = HOLLIHOP_PROXY_URL + '?action=addLead'
+      + '&name=' + encodeURIComponent(name)
+      + '&phone=' + encodeURIComponent(phone)
+      + '&course=' + encodeURIComponent('Английский язык')
+      + '&adSource=' + encodeURIComponent(adSource || 'Интернет (СММ)')
+      + '&level=' + encodeURIComponent(level)
+      + '&birthday=' + encodeURIComponent(birthday || '')
+      + '&score=' + encodeURIComponent(correctCount + '/' + total + ' (' + pct + '%)');
+
+    fetch(url)
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.ok){
+          console.log('✅ Лид создан в Hollihop, ID:', data.leadId);
+        } else {
+          console.warn('⚠️ Не удалось создать лид:', data && data.error);
+        }
+      })
+      .catch(err => console.warn('⚠️ Ошибка отправки лида:', err));
+  }
+</script>
+
+</body>
+</html>
